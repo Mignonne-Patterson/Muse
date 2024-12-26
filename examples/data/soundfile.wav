@@ -1,0 +1,4 @@
+<audio controls>
+    <source src="soundfiles/example_sound.mp3" type="audio/mpeg">
+Your browser does not support HTML5 audio.
+</audio>

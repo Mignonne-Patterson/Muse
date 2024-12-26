@@ -1,0 +1,7 @@
+# Piano SoundFont Configuration File
+This file configures a simple piano instrument using SFZ format.
+[region]
+sample=../samples/A4.wav
+tone=A0.5	# 1st harmonic, fundamental pitch (A2)
+freq_cps_min = A3 # Minimum frequency this region responds tofreq_cps_max = C7 	#	kHzMaximum frquency it will play
+keymin=C0 keymax=B8
