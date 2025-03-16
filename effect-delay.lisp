@@ -1,26 +1,31 @@
-# Delay Effect Module for Muse Synthesis System
-This module provides a delay effect that can be used in real-time audio processing within the Muse system.
-## OverviewThe `effect_delay` module allows users to add echoes or delays at various time intervals, enhancing musical textures and creating space effects. The implementation is based on feedback loops where an input signal's delayed version feeds back into itself with a certain amount of gain (reduction).
-The delay effect can be configured for both mono (`1 channel`) as well stereo audio streams by adding two separate buffers that hold the left-channel data separately from right.
-## Key Features- Adjustable **delay time** in seconds: controls how long it takes before an echo is produced.- Variable feedback amount between `0` (no delay) and less than or equal to `-1`, which results effectively infinite loops until silence due loss of amplitude at each iteration. The gain reduces with the number iterations creating a natural decay curve.
-- Wet/Dry mix control: Allows blending in varying amounts from just dry signal through pure echo, providing creative possibilities for sound design.- Stereo capability offering independent delays on left and right channels (stereo mode).
-The implementation also includes real-time buffer management to handle variable delay times efficiently without introducing latency or artifacts like clicks.
-## Implementation DetailsThis section provides a high-level description of the code structure within `effect_delay.lisp`. The actual source files contain detailed comments explaining each part in detail but an overview is included here for clarity:
-The main class, named **DELAY-EFFECT**, inherits from base effect classes provided by Muse which require overriding methods such as *process-buffer*.
-```lisp
-(defclass delay-effect (effect)
-  ((delay-time :accessor get-delay-time :initarg :time :documentation "Delay time in seconds")
-   ;; Additional parameters: feedback, mix level etc...
-))```
-The `DELAY-EFFECT` class has accessors for each parameter needed to control the effect and an initialization argument (`TIME`) that sets up how long before playback should start hearing echoes.
-pseudocode of *process-buffer* method:
-```lisp
-(defmethod process ((delay delay-effect) inbuffer outbuffer)
-  ;; Determine amount by which input buffer needs shifting based on sample rate & desired time offset (in seconds).
-note: A circular queue or ring buffers are typically used for implementing the actual delaying mechanism.
-pseudocode of internal *process-sample* method:
-defmethod process-samples ((delay delay-effect) insample outsamp)
-  ;; Write current input to buffer, then mix in delayed samples based on time offset
-``` 
-The module includes functionality such as dynamic re-sizing of buffers if required (for longer delays), and appropriate handling for stereo signals where separate processing is needed.
-in summary: Delay effect offers flexible configuration options essential when wanting subtle or dramatic effects within live musical performances. The provided example should give a good idea about its usage alongside other components in the Muse system.
+;; **Delay Effect Module for Muse Synthesis System**
+
+This module provides advanced delay functionality designed to be integrated into real-time audio processing within our high-performance synthesis and composition platform, *Muse*. The `DELAY-EFFECT` class is a specialized effect that enhances musical textures through echo or reverberation effects. It supports both mono (single-channel) as well stereo sound streams by maintaining separate buffers for left/right channels.
+
+**Key Features:**
+The delay feature can be customized with the following parameters:
+- **Delay Time**: The duration between input signal and its echoed response in seconds, allowing precise control over effect timing to achieve various audio effects like reverb or ambiance enhancement. *(Adjustable by user)* 
+ - *Example*: Setting a 1 second interval creates an echo where every sound is heard after approximately one unit of time.
+- **Feedback Level**: A value between `0` (no feedback) and `-∞`, indicating how much the delayed signal contributes back into itself, shaping its decay. This parameter defines whether echoes diminish naturally or sustain indefinitely until volume fades away entirely due to repeated attenuation over multiple iterations *(Adjustable by user)*
+The implementation supports a variable mix of dry versus wet signals through a **Wet/Dry Mix** control slider that ranges from `0%` (only original sound) up-to 100%(pure echo), enabling creative blending for unique audio designs. The effect is also capable of stereo operation where independent delays can be set per channel, providing spatial separation within the auditory field *(Adjustable by user)*
+
+**Real-Time Buffer Management: ** 
+The internal circular buffers efficiently handle dynamic delay times without causing latency or introducing artifacts like clicks and pops when adjusting parameters on-the-fly. This ensures seamless integration into live performances where immediate feedback is crucial.
+## Implementation Overview:
+### DELAY-EFFECT Class Hierarchy Diagram (`effect-delay.lisp`):
+defclass **DELAY-Effect** ( effect )
+note: Inherits from the base 'Efect' class which enforces certain abstract methods such as *process-buffer* and requires user-specific overrides. Each subclass is expected to implement its own version of these core functionalities based on unique properties.
+### Properties:
+a) Delay-Time
+b)**Feedback Level** : Specifies how much delay output feeds back into the input signal loop, determining echo decay behavior (controlled by feedback reduction)
+c)dry/wet Mix Ratio: Represents balance between dry source and processed echoes in each frame of audio being generated
+d)eLeft & Right Buffers *(For Stereo)* 
+
+### Methods:
+defmethod **process** ((delay DELAY-EFFECT) input-buffer output buffer):
+The main entry point that iteratively calls * process-samples* for every sample contained within the current time window. This method handles both mono and stereo processing seamlessly based on whether separate left/right buffers are present.
+pseudocode of internal defmethed **process-sample** ((delay DELAY-EFFECT) insample outsamp):
+  - Reads incoming audio samples from input buffer
+- Writes these inputs into delay-buffer, maintaining circular queue structure to support dynamic resizing as needed *(Supports longer delays)*
+The implementation ensures thread-safety during runtime when multiple channels need concurrent processing and guarantees consistent performance even at high sample rates.
+in summary: The DELAY-EFFECT module offers robust configuration options essential for achieving intricate sound design within live musical performances. Proper usage alongside other components in the Muse system enables composers to create rich, layered compositions with added depth of expression.
