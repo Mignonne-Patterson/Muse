@@ -1,10 +1,16 @@
 #!/bin/bash
 # This script builds Muse with Common Lisp.
+
 set -e # Exit on error
 
 echo "Starting build process for Muse..."
-cd /path/to/Muse/
-#	Compile the muse system using Quicklisp's quickload command and compile it into a binary file that can be executed independently of SBCL (Steel Bank Common Lisp).
-esac $(ql:quickload 'muse) --output musesynth
-echo "Build completed successfully. Binary available as 'musysnth'"
+
+# Navigate to the Muse directory (update the path if necessary)
+cd "$(dirname "$0")/.." || exit 1
+
+# Compile the Muse system using Quicklisp's quickload command
+sbcl --eval "(ql:quickload 'muse)" --eval "(sb-ext:save-lisp-and-die \"musesynth\" :executable t :toplevel #'muse:start)"
+
+echo "Build completed successfully. Binary available as 'musesynth'"
+
 exit 0
