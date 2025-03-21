@@ -1,13 +1,46 @@
-# composition.lisp - Composition Tools for Muse Music Synthesis System (Common Lisp)
+;; composition.lisp - Composition Tools for Muse Music Synthesis System (Common Lisp)
 
-## Overview
-This module provides a comprehensive set of tools to aid in algorithmic and procedural music generation within the Common Lisp environment. It enables users to create complex musical compositions by defining sequences, patterns, harmonies dynamically.
+(in-package :cl-user)
 
-### Key Components:
-- **Sequence**: Represents ordered sets that can be played sequentially or looped through based on specific parameters like duration, tempo changes etc., allowing for multi-track composition where tracks have distinct timings and overlapping parts without manual adjustment of every note's timing individually. \-	**Pattern Generator:** Generates musical patterns using deterministic (e.g.: Markov chains), stochastic algorithms as well as rule-based methods; making it easy to produce intricate rhythmic or melodic motifs which can be utilized in larger compositions by varying their tempos, pitches and timbres.
+(defpackage :muse.composition
+  (:use :cl :muse.core)
+  (:export 
+    create-sequence
+    play-sequence
+    add-note
+    set-tempo
+  ))
 
-## Usage:
-The following examples demonstrate how the composition tools provided within this module could potentially integrate with your muse project. For simplicity we will focus on using sequences alongside pattern generators for creating a basic yet dynamic score that changes its harmonic structure based upon time or other external triggers without intervention after initial setup by user (automation).
+(in-package :muse.composition)
 
-### Example 1: Creating and Playing Simple Melodic Sequences:```lisp(ql:defsystem :muse-composition)
-defpackage muse/compositions (:nicknames 
+(defun create-sequence ()
+  "Create a new empty sequence."
+  (make-array 0 :adjustable t :fill-pointer 0))
+
+(defun add-note (sequence note duration)
+  "Add a note to the sequence."
+  (vector-push-extend (list note duration) sequence))
+
+(defun set-tempo (sequence tempo)
+  "Set the tempo for the sequence."
+  (setf (getf (array-dimensions sequence) :tempo) tempo))
+
+(defun play-sequence (sequence)
+  "Play the sequence."
+  (loop for item across sequence
+        do (let ((note (first item))
+                 (duration (second item)))
+             (play-note note duration))))
+
+(defun play-note (note duration)
+  "Play a single note for the given duration."
+  ;; Placeholder for actual sound synthesis function
+  (format t "Playing note ~a for ~a seconds~%" note duration))
+
+;; Example usage
+(let ((seq (create-sequence)))
+  (add-note seq 'c4 0.5)
+  (add-note seq 'e4 0.5)
+  (add-note seq 'g4 0.5)
+  (set-tempo seq 120)
+  (play-sequence seq))
